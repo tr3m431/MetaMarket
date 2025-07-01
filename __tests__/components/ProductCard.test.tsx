@@ -2,7 +2,6 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import CardComponent from '../../components/CardComponent'
 import { Card } from '../../types/card'
-import { WatchlistProvider } from '../../contexts/WatchlistContext'
 
 const mockCard: Card = {
   id: 'test-card-1',
@@ -33,16 +32,14 @@ jest.mock('../../contexts/WatchlistContext', () => ({
     addToWatchlist: jest.fn(),
     removeFromWatchlist: jest.fn(),
     isInWatchlist: jest.fn(() => false),
+    getWatchlistCount: jest.fn(() => 0),
   }),
+  WatchlistProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
 describe('CardComponent', () => {
   it('should render card information correctly', () => {
-    render(
-      <WatchlistProvider>
-        <CardComponent card={mockCard} />
-      </WatchlistProvider>
-    )
+    render(<CardComponent card={mockCard} />)
 
     expect(screen.getByText('Blue-Eyes White Dragon')).toBeInTheDocument()
     expect(screen.getByText('Normal Monster')).toBeInTheDocument()
@@ -55,11 +52,7 @@ describe('CardComponent', () => {
   })
 
   it('should display card image', () => {
-    render(
-      <WatchlistProvider>
-        <CardComponent card={mockCard} />
-      </WatchlistProvider>
-    )
+    render(<CardComponent card={mockCard} />)
 
     const image = screen.getByAltText('Blue-Eyes White Dragon')
     expect(image).toBeInTheDocument()
@@ -68,44 +61,28 @@ describe('CardComponent', () => {
 
   it('should show ban status when card is banned', () => {
     const bannedCard = { ...mockCard, isBanned: true }
-    render(
-      <WatchlistProvider>
-        <CardComponent card={bannedCard} />
-      </WatchlistProvider>
-    )
+    render(<CardComponent card={bannedCard} />)
 
     expect(screen.getByText('BANNED')).toBeInTheDocument()
   })
 
   it('should show limited status when card is limited', () => {
     const limitedCard = { ...mockCard, isLimited: true }
-    render(
-      <WatchlistProvider>
-        <CardComponent card={limitedCard} />
-      </WatchlistProvider>
-    )
+    render(<CardComponent card={limitedCard} />)
 
     expect(screen.getByText('LIMITED')).toBeInTheDocument()
   })
 
   it('should show semi-limited status when card is semi-limited', () => {
     const semiLimitedCard = { ...mockCard, isSemiLimited: true }
-    render(
-      <WatchlistProvider>
-        <CardComponent card={semiLimitedCard} />
-      </WatchlistProvider>
-    )
+    render(<CardComponent card={semiLimitedCard} />)
 
     expect(screen.getByText('SEMI-LIMITED')).toBeInTheDocument()
   })
 
   it('should show reprint indicator when card is a reprint', () => {
     const reprintCard = { ...mockCard, isReprint: true }
-    render(
-      <WatchlistProvider>
-        <CardComponent card={reprintCard} />
-      </WatchlistProvider>
-    )
+    render(<CardComponent card={reprintCard} />)
 
     expect(screen.getByText('REPRINT')).toBeInTheDocument()
   })

@@ -45,4 +45,31 @@ global.matchMedia = jest.fn().mockImplementation((query) => ({
   addEventListener: jest.fn(),
   removeEventListener: jest.fn(),
   dispatchEvent: jest.fn(),
+}))
+
+jest.mock('@heroicons/react/24/outline', () => ({
+  __esModule: true,
+  ...Object.fromEntries(
+    [
+      'HeartIcon',
+      'MagnifyingGlassIcon',
+      'UserIcon',
+      'Bars3Icon',
+      'XMarkIcon',
+      'ChevronDownIcon',
+      'ArrowRightIcon',
+      'ComputerDesktopIcon',
+      'CameraIcon',
+      'MusicalNoteIcon',
+      'BookOpenIcon',
+      'PaintBrushIcon',
+      'PuzzlePieceIcon',
+      'ChartBarIcon',
+      'BellIcon',
+    ].map((name) => [name, () => <svg data-testid={name} />])
+  ),
+}))
+jest.mock('@heroicons/react/24/solid', () => ({
+  __esModule: true,
+  HeartIcon: () => <svg data-testid="HeartSolidIcon" />,
 })) 

@@ -39,7 +39,7 @@ export default function CardComponent({ card }: CardComponentProps) {
         <Image
           src={card.imageUrl}
           alt={card.name}
-          fill={true}
+          fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />

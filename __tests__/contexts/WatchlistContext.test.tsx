@@ -1,35 +1,36 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import { WatchlistProvider, useWatchlist } from '../../contexts/WatchlistContext'
 import { Card } from '../../types/card'
+
+const testCard: Card = {
+  id: 'test-card-1',
+  name: 'Blue-Eyes White Dragon',
+  type: 'Normal Monster',
+  rarity: 'Ultra Rare',
+  set: 'Legend of Blue Eyes White Dragon',
+  setCode: 'LOB-001',
+  cardNumber: '001',
+  isReprint: false,
+  isBanned: false,
+  isLimited: false,
+  isSemiLimited: false,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  attribute: 'LIGHT',
+  level: 8,
+  race: 'Dragon',
+  attack: 3000,
+  defense: 2500,
+  description: 'This legendary dragon is a powerful engine of destruction.',
+  imageUrl: '/images/blue-eyes.jpg',
+}
 
 // Test component to access context
 const TestComponent = () => {
   const { watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist()
   
-  const testCard: Card = {
-    id: 'test-card-1',
-    name: 'Blue-Eyes White Dragon',
-    type: 'Normal Monster',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-001',
-    cardNumber: '001',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    attribute: 'LIGHT',
-    level: 8,
-    race: 'Dragon',
-    attack: 3000,
-    defense: 2500,
-    description: 'This legendary dragon is a powerful engine of destruction.',
-    imageUrl: '/images/blue-eyes.jpg',
-  }
-
   return (
     <div>
       <div data-testid="watchlist-count">{watchlist.length}</div>
@@ -121,40 +122,27 @@ describe('WatchlistContext', () => {
     })
 
     // Check localStorage
-    const stored = localStorage.getItem('watchlist')
+    const stored = localStorage.getItem('metamarket_watchlist')
     expect(stored).toBeTruthy()
     
     const parsed = JSON.parse(stored!)
     expect(parsed).toHaveLength(1)
-    expect(parsed[0].id).toBe('test-card-1')
+    expect(parsed[0].cardId).toBe('test-card-1')
   })
 
   it('should load watchlist from localStorage on mount', () => {
-    // Pre-populate localStorage
-    const testCard: Card = {
-      id: 'test-card-1',
-      name: 'Blue-Eyes White Dragon',
-      type: 'Normal Monster',
-      rarity: 'Ultra Rare',
-      set: 'Legend of Blue Eyes White Dragon',
-      setCode: 'LOB-001',
-      cardNumber: '001',
-      isReprint: false,
-      isBanned: false,
-      isLimited: false,
-      isSemiLimited: false,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z',
-      attribute: 'LIGHT',
-      level: 8,
-      race: 'Dragon',
-      attack: 3000,
-      defense: 2500,
-      description: 'This legendary dragon is a powerful engine of destruction.',
-      imageUrl: '/images/blue-eyes.jpg',
-    }
-    
-    localStorage.setItem('watchlist', JSON.stringify([testCard]))
+    // Pre-populate localStorage with the correct structure
+    localStorage.setItem('metamarket_watchlist', JSON.stringify([
+      {
+        id: 'any-id',
+        userId: 'current-user',
+        cardId: 'test-card-1',
+        card: testCard,
+        alertPrice: undefined,
+        alertDirection: undefined,
+        createdAt: new Date().toISOString(),
+      },
+    ]))
 
     render(
       <WatchlistProvider>

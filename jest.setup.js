@@ -66,6 +66,7 @@ jest.mock('@heroicons/react/24/outline', () => ({
       'PuzzlePieceIcon',
       'ChartBarIcon',
       'BellIcon',
+      'ArrowTrendingUpIcon',
     ].map((name) => [name, () => <svg data-testid={name} />])
   ),
 }))

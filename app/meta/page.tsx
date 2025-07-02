@@ -15,7 +15,7 @@ import {
   Pie,
   Cell
 } from 'recharts'
-import { TrendingUpIcon, TrendingDownIcon, ChartBarIcon, UsersIcon } from '@heroicons/react/24/outline'
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChartBarIcon, UsersIcon } from '@heroicons/react/24/outline'
 
 // Mock data for meta analysis
 const topDecks = [
@@ -62,8 +62,8 @@ export default function MetaPage() {
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1week' | '1month' | '3months'>('1month')
 
   const getTrendIcon = (trend: string) => {
-    if (trend === 'up') return <TrendingUpIcon className="h-4 w-4 text-green-600" />
-    if (trend === 'down') return <TrendingDownIcon className="h-4 w-4 text-red-600" />
+    if (trend === 'up') return <ArrowTrendingUpIcon className="h-4 w-4 text-green-600" />
+    if (trend === 'down') return <ArrowTrendingDownIcon className="h-4 w-4 text-red-600" />
     return <ChartBarIcon className="h-4 w-4 text-gray-600" />
   }
 

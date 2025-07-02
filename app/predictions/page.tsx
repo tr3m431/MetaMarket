@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { TrendingUpIcon, TrendingDownIcon, MinusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, MinusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { Card, PricePrediction } from '@/types/card'
 
 // Mock data for predictions
@@ -128,8 +128,8 @@ export default function PredictionsPage() {
   })
 
   const getDirectionIcon = (dir: string) => {
-    if (dir === 'up') return <TrendingUpIcon className="h-5 w-5 text-green-600" />
-    if (dir === 'down') return <TrendingDownIcon className="h-5 w-5 text-red-600" />
+    if (dir === 'up') return <ArrowTrendingUpIcon className="h-5 w-5 text-green-600" />
+    if (dir === 'down') return <ArrowTrendingDownIcon className="h-5 w-5 text-red-600" />
     return <MinusIcon className="h-5 w-5 text-gray-400" />
   }
 

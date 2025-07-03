@@ -1,4 +1,4 @@
-# MetaMarket - Yu-Gi-Oh! Card Value Tracker & Predictor
+-# MetaMarket - Yu-Gi-Oh! Card Value Tracker & Predictor
 
 An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card values based on meta trends, tournament results, and product releases.
 
@@ -15,6 +15,7 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 - Link cards to decks and decks to events
 - Display usage stats of a card in meta over time
 - Include data filters (format, event size, region)
+- **[NEW] Admin UI for tournament management at `/admin/tournaments` (mock only, no backend yet)**
 
 ### 3. Price Prediction
 - Time series and ML-based price forecasting
@@ -110,7 +111,7 @@ npm run dev
 - [x] Price history charts
 - [x] User authentication system
 - [x] Watchlist functionality
-- [ ] Tournament data integration
+- [~] Tournament data integration (**Admin UI for tournaments available, decklist management and backend integration planned**)
 - [ ] Price prediction models
 
 ### Future Additions

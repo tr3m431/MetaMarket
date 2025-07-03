@@ -7,26 +7,26 @@ import { Card, PriceHistory, PricePrediction } from '@/types/card'
 // Mock cards (copied from cards/page.tsx)
 const mockCards: Card[] = [
   {
-    id: '1',
-    name: 'Blue-Eyes White Dragon',
-    type: 'Normal Monster',
-    attribute: 'LIGHT',
-    level: 8,
-    race: 'Dragon',
-    attack: 3000,
-    defense: 2500,
+  id: '1',
+  name: 'Blue-Eyes White Dragon',
+  type: 'Normal Monster',
+  attribute: 'LIGHT',
+  level: 8,
+  race: 'Dragon',
+  attack: 3000,
+  defense: 2500,
     description: 'This legendary dragon is a powerful engine of destruction.',
-    imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-001',
-    cardNumber: '001',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
+  imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
+  rarity: 'Ultra Rare',
+  set: 'Legend of Blue Eyes White Dragon',
+  setCode: 'LOB-001',
+  cardNumber: '001',
+  isReprint: false,
+  isBanned: false,
+  isLimited: false,
+  isSemiLimited: false,
+  createdAt: '2024-01-01',
+  updatedAt: '2024-01-01'
   },
   {
     id: '2',
@@ -133,16 +133,16 @@ const mockCards: Card[] = [
 // Mock price histories for each card
 const mockPriceHistories: Record<string, PriceHistory> = {
   '1': {
-    cardId: '1',
-    vendor: 'TCGPlayer',
-    prices: [
-      { date: '2024-01-01', price: 35.00, condition: 'Near Mint' },
-      { date: '2024-01-08', price: 38.50, condition: 'Near Mint' },
-      { date: '2024-01-15', price: 42.00, condition: 'Near Mint' },
-      { date: '2024-01-22', price: 45.99, condition: 'Near Mint' },
-      { date: '2024-01-29', price: 48.75, condition: 'Near Mint' },
-      { date: '2024-02-05', price: 52.00, condition: 'Near Mint' },
-    ]
+  cardId: '1',
+  vendor: 'TCGPlayer',
+  prices: [
+    { date: '2024-01-01', price: 35.00, condition: 'Near Mint' },
+    { date: '2024-01-08', price: 38.50, condition: 'Near Mint' },
+    { date: '2024-01-15', price: 42.00, condition: 'Near Mint' },
+    { date: '2024-01-22', price: 45.99, condition: 'Near Mint' },
+    { date: '2024-01-29', price: 48.75, condition: 'Near Mint' },
+    { date: '2024-02-05', price: 52.00, condition: 'Near Mint' },
+  ]
   },
   '2': {
     cardId: '2',
@@ -209,23 +209,23 @@ const mockPriceHistories: Record<string, PriceHistory> = {
 // Mock predictions for each card
 const mockPredictions: Record<string, PricePrediction> = {
   '1': {
-    cardId: '1',
+  cardId: '1',
     card: mockCards[0],
-    currentPrice: 52.00,
-    predictedPrice: 58.50,
-    changeAmount: 6.50,
-    changePercentage: 12.5,
-    confidence: 0.85,
-    direction: 'up',
-    explanation: 'Card has shown consistent usage in top-tier tournament decks, with increasing meta presence.',
-    factors: [
-      { factor: 'Tournament Usage', impact: 'positive', weight: 0.4, description: 'High usage in recent YCS events' },
-      { factor: 'Meta Position', impact: 'positive', weight: 0.3, description: 'Strong position in current meta' },
-      { factor: 'Supply', impact: 'negative', weight: 0.2, description: 'Limited supply from original set' },
-      { factor: 'Demand', impact: 'positive', weight: 0.1, description: 'High collector and player demand' }
-    ],
-    timeframe: '1month',
-    timestamp: '2024-02-05'
+  currentPrice: 52.00,
+  predictedPrice: 58.50,
+  changeAmount: 6.50,
+  changePercentage: 12.5,
+  confidence: 0.85,
+  direction: 'up',
+  explanation: 'Card has shown consistent usage in top-tier tournament decks, with increasing meta presence.',
+  factors: [
+    { factor: 'Tournament Usage', impact: 'positive', weight: 0.4, description: 'High usage in recent YCS events' },
+    { factor: 'Meta Position', impact: 'positive', weight: 0.3, description: 'Strong position in current meta' },
+    { factor: 'Supply', impact: 'negative', weight: 0.2, description: 'Limited supply from original set' },
+    { factor: 'Demand', impact: 'positive', weight: 0.1, description: 'High collector and player demand' }
+  ],
+  timeframe: '1month',
+  timestamp: '2024-02-05'
   },
   '2': {
     cardId: '2',

@@ -6,11 +6,37 @@ import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Card, PriceHistory, PricePrediction } from '@/types/card'
 import { useWatchlist } from '@/contexts/WatchlistContext'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts'
+import { mockTournaments } from '@/types/mockTournaments'
 
 interface CardDetailPageProps {
   card: Card
   priceHistory: PriceHistory
   prediction: PricePrediction
+}
+
+function getCardUsageStats(cardId: string) {
+  let deckCount = 0
+  let tournamentSet = new Set<string>()
+  let placements: number[] = []
+  let usageDetails: { tournament: string, player: string, placement: number, deckType: string }[] = []
+  for (const t of mockTournaments) {
+    for (const deck of t.decklists) {
+      const inDeck = [...deck.mainDeck, ...deck.extraDeck, ...deck.sideDeck].some(dc => dc.cardId === cardId)
+      if (inDeck) {
+        deckCount++
+        tournamentSet.add(t.name)
+        placements.push(deck.placement)
+        usageDetails.push({ tournament: t.name, player: deck.player, placement: deck.placement, deckType: deck.deckType })
+      }
+    }
+  }
+  const avgPlacement = placements.length ? (placements.reduce((a, b) => a + b, 0) / placements.length).toFixed(2) : 'N/A'
+  return {
+    deckCount,
+    tournamentCount: tournamentSet.size,
+    avgPlacement,
+    usageDetails
+  }
 }
 
 export default function CardDetailPage({ card, priceHistory, prediction }: CardDetailPageProps) {
@@ -28,6 +54,8 @@ export default function CardDetailPage({ card, priceHistory, prediction }: CardD
 
   const formatPrice = (price: number) => `$${price.toFixed(2)}`
   const formatPercentage = (percentage: number) => `${percentage > 0 ? '+' : ''}${percentage.toFixed(1)}%`
+
+  const usageStats = getCardUsageStats(card.id)
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -242,7 +270,38 @@ export default function CardDetailPage({ card, priceHistory, prediction }: CardD
               </div>
             </div>
 
-            {/* Tournament Usage - can be added as a prop or separate component */}
+            {/* Tournament Usage Section */}
+            <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Tournament Usage</h2>
+              <div className="mb-2 text-gray-700">
+                Used in <span className="font-semibold">{usageStats.deckCount}</span> deck(s) across <span className="font-semibold">{usageStats.tournamentCount}</span> tournament(s).<br/>
+                Average placement: <span className="font-semibold">{usageStats.avgPlacement}</span>
+              </div>
+              {usageStats.usageDetails.length > 0 ? (
+                <table className="min-w-full bg-white rounded-lg shadow mb-4">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Tournament</th>
+                      <th className="px-4 py-2">Player</th>
+                      <th className="px-4 py-2">Placement</th>
+                      <th className="px-4 py-2">Deck Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usageStats.usageDetails.map((u, i) => (
+                      <tr key={i} className="border-t">
+                        <td className="px-4 py-2">{u.tournament}</td>
+                        <td className="px-4 py-2">{u.player}</td>
+                        <td className="px-4 py-2">{u.placement}</td>
+                        <td className="px-4 py-2">{u.deckType}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-gray-500">This card has not appeared in any tournament decks yet.</div>
+              )}
+            </div>
           </div>
         </div>
       </div>

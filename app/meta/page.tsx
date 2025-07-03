@@ -16,6 +16,7 @@ import {
   Cell
 } from 'recharts'
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChartBarIcon, UsersIcon } from '@heroicons/react/24/outline'
+import { mockTournaments } from '@/types/mockTournaments'
 
 // Mock data for meta analysis
 const topDecks = [
@@ -57,9 +58,31 @@ const metaTrends = [
 const formatPercentage = (value: number) => `${value.toFixed(1)}%`
 const formatWinRate = (value: number) => `${value.toFixed(1)}%`
 
+function getCardMetaUsageStats(formatFilter?: string) {
+  const cardUsage: Record<string, { name: string, count: number, tournaments: Set<string> }> = {}
+  for (const t of mockTournaments) {
+    if (formatFilter && t.format !== formatFilter) continue
+    for (const deck of t.decklists) {
+      for (const cardList of [deck.mainDeck, deck.extraDeck, deck.sideDeck]) {
+        for (const dc of cardList) {
+          if (!cardUsage[dc.cardId]) {
+            cardUsage[dc.cardId] = { name: dc.card.name, count: 0, tournaments: new Set() }
+          }
+          cardUsage[dc.cardId].count++
+          cardUsage[dc.cardId].tournaments.add(t.name)
+        }
+      }
+    }
+  }
+  return Object.entries(cardUsage)
+    .map(([id, data]) => ({ id, ...data, tournamentCount: data.tournaments.size }))
+    .sort((a, b) => b.count - a.count)
+}
+
 export default function MetaPage() {
   const [selectedDeck, setSelectedDeck] = useState<string>('all')
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1week' | '1month' | '3months'>('1month')
+  const [formatFilter, setFormatFilter] = useState<string>('all')
 
   const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <ArrowTrendingUpIcon className="h-4 w-4 text-green-600" />
@@ -72,6 +95,9 @@ export default function MetaPage() {
     if (trend === 'down') return 'text-red-600'
     return 'text-gray-600'
   }
+
+  const cardUsageStats = getCardMetaUsageStats(formatFilter === 'all' ? undefined : formatFilter)
+  const uniqueFormats = Array.from(new Set(mockTournaments.map(t => t.format)))
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -254,6 +280,43 @@ export default function MetaPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Card Usage Meta Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Most Used Cards (All Tournaments)</h2>
+          <div className="mb-4">
+            <label className="mr-2 font-medium">Format</label>
+            <select
+              value={formatFilter}
+              onChange={e => setFormatFilter(e.target.value)}
+              className="border rounded px-3 py-1"
+            >
+              <option value="all">All</option>
+              {uniqueFormats.map(f => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+          </div>
+          <table className="min-w-full bg-white rounded-lg shadow mb-4">
+            <thead>
+              <tr>
+                <th className="px-4 py-2">Card Name</th>
+                <th className="px-4 py-2">Usage Count</th>
+                <th className="px-4 py-2">Tournaments</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cardUsageStats.map((c) => (
+                <tr key={c.id} className="border-t">
+                  <td className="px-4 py-2">{c.name}</td>
+                  <td className="px-4 py-2">{c.count}</td>
+                  <td className="px-4 py-2">{c.tournamentCount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {cardUsageStats.length === 0 && <div className="text-gray-500">No card usage data available.</div>}
         </div>
 
         {/* Meta Trends Section */}

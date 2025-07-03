@@ -105,4 +105,5 @@ temp/
 
 # Project specific files
 Metamarket Requirements.pdf
-*.pdf 
+*.pdf backend/venv/
+backend/venv/

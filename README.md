@@ -59,7 +59,7 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 - **Icons**: Heroicons
 - **Date Handling**: date-fns
 
-### Backend/API (Future)
+### Backend/API
 - **Framework**: FastAPI (Python)
 - **Models**: LightGBM / Prophet / XGBoost
 - **Serving**: REST endpoints for predictions and queries

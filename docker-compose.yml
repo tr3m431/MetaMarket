@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: tr3m431
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: metamarket
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - metamarket-network
+
+  backend:
+    build: ./backend
+    command: alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: postgresql://tr3m431:password@db:5432/metamarket
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - metamarket-network
+
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - metamarket-network
+
+volumes:
+  postgres_data:
+
+networks:
+  metamarket-network:
+    driver: bridge 

@@ -1,4 +1,4 @@
--# MetaMarket - Yu-Gi-Oh! Card Value Tracker & Predictor
+# MetaMarket - Yu-Gi-Oh! Card Value Tracker & Predictor
 
 An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card values based on meta trends, tournament results, and product releases.
 
@@ -15,7 +15,8 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 - Link cards to decks and decks to events
 - Display usage stats of a card in meta over time
 - Include data filters (format, event size, region)
-- **[NEW] Admin UI for tournament management at `/admin/tournaments` (mock only, no backend yet)**
+- **[NEW] Tournament management with PostgreSQL database**
+- **[NEW] Real-time tournament data via REST API**
 
 ### 3. Price Prediction
 - Time series and ML-based price forecasting
@@ -62,13 +63,22 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 
 ### Backend/API
 - **Framework**: FastAPI (Python)
+- **Database**: PostgreSQL with SQLAlchemy ORM
+- **Migrations**: Alembic for database schema management
 - **Models**: LightGBM / Prophet / XGBoost
 - **Serving**: REST endpoints for predictions and queries
 - **Queueing**: Celery + Redis for background scraping, model runs
 
-### Database (Future)
-- **Primary**: PostgreSQL (via Supabase)
+### Database
+- **Primary**: PostgreSQL
 - **Tables**: Cards, Prices, Events, Decks, Predictions, Users/Watchlists
+- **Migration System**: Alembic for schema versioning
+
+### Containerization
+- **Docker**: Full containerization with docker-compose
+- **Development**: Hot-reload enabled for both frontend and backend
+- **Database**: PostgreSQL container with persistent storage
+- **Networking**: Isolated Docker network for services
 
 ### Storage (Future)
 - AWS S3 / Supabase Storage for decklist files, images
@@ -81,28 +91,44 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Docker and Docker Compose
+- Node.js 18+ (for local development without Docker)
 
-### Installation
+### Installation with Docker (Recommended)
 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd metamarket-yugioh-tracker
+cd MetaMarket
 ```
 
-2. Install dependencies:
+2. Start all services with Docker:
+```bash
+# Development mode with hot reloading
+docker-compose -f docker-compose.dev.yml up --build
+
+# Or production mode
+docker-compose up --build
+```
+
+3. Access the application:
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend API: [http://localhost:8000](http://localhost:8000)
+- Database: localhost:5432 (user: tr3m431, password: password, db: metamarket)
+
+### Local Development (Alternative)
+
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Run the development server:
+2. Run the development server:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📊 Features in Development
 
@@ -111,8 +137,11 @@ npm run dev
 - [x] Price history charts
 - [x] User authentication system
 - [x] Watchlist functionality
-- [~] Tournament data integration (**Admin UI for tournaments available, decklist management and backend integration planned**)
-- [ ] Price prediction models
+- [x] **Tournament data integration with PostgreSQL**
+- [x] **REST API backend with FastAPI**
+- [x] **Docker containerization**
+- [x] **Database migrations with Alembic**
+- [~] Price prediction models
 
 ### Future Additions
 - [ ] Discord bot integration
@@ -141,10 +170,42 @@ contexts/
 ├── AuthContext.tsx  # Authentication
 └── WatchlistContext.tsx # Watchlist management
 
+backend/
+├── main.py          # FastAPI application
+├── models.py        # SQLAlchemy models
+├── database.py      # Database configuration
+└── alembic/         # Database migrations
+
 lib/
 ├── api/             # API utilities
 ├── charts/          # Chart configurations
 └── utils/           # Utility functions
+```
+
+## 🐳 Docker Commands
+
+### Development
+```bash
+# Start all services
+docker-compose -f docker-compose.dev.yml up --build
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs
+
+# Stop services
+docker-compose -f docker-compose.dev.yml down
+
+# Rebuild specific service
+docker-compose -f docker-compose.dev.yml build backend
+```
+
+### Production
+```bash
+# Start production services
+docker-compose up --build
+
+# Stop and remove volumes
+docker-compose down -v
 ```
 
 ## 🤝 Contributing

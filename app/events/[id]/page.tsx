@@ -19,11 +19,38 @@ export default function Page({ params }: { params: { id: string } }) {
       .catch(err => setError(err.message))
   }, [params.id])
 
-  if (error) {
-    return <div className="p-8 text-center text-red-600">{error}</div>
-  }
-  if (!tournament) {
-    return <div className="p-8 text-center">Loading tournament...</div>
-  }
-  return <TournamentDetailPage tournament={tournament} />
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8 px-6">
+          <div className="flex items-center gap-4 mb-4">
+            <a 
+              href="/events" 
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              ← Back to Events
+            </a>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {error ? (
+            <div className="text-center py-8 text-red-600">
+              <p className="text-lg font-medium">Error loading tournament</p>
+              <p className="text-sm text-gray-500 mt-2">{error}</p>
+            </div>
+          ) : !tournament ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading tournament...</p>
+            </div>
+          ) : (
+            <TournamentDetailPage tournament={tournament} />
+          )}
+        </div>
+      </div>
+    </div>
+  )
 } 

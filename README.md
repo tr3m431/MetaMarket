@@ -114,7 +114,7 @@ docker-compose up --build
 3. Access the application:
 - Frontend: [http://localhost:3000](http://localhost:3000)
 - Backend API: [http://localhost:8000](http://localhost:8000)
-- Database: localhost:5432 (user: tr3m431, password: password, db: metamarket)
+- Database: localhost:5432
 
 ### Local Development (Alternative)
 

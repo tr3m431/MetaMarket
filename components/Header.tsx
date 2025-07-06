@@ -45,7 +45,7 @@ export default function Header({ onSearch }: HeaderProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8 ml-12">
             <Link href="/cards" className="text-gray-600 hover:text-gray-900 transition-colors">
               Cards
             </Link>

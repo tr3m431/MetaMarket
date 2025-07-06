@@ -1,139 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { MagnifyingGlassIcon, FunnelIcon, HeartIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Card } from '@/types/card'
 import { useWatchlist } from '@/contexts/WatchlistContext'
 
-// Mock data - in a real app, this would come from an API
-const mockCards: Card[] = [
-  {
-    id: '1',
-    name: 'Blue-Eyes White Dragon',
-    type: 'Normal Monster',
-    attribute: 'LIGHT',
-    level: 8,
-    race: 'Dragon',
-    attack: 3000,
-    defense: 2500,
-    description: 'This legendary dragon is a powerful engine of destruction.',
-    imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-001',
-    cardNumber: '001',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '2',
-    name: 'Dark Magician',
-    type: 'Normal Monster',
-    attribute: 'DARK',
-    level: 7,
-    race: 'Spellcaster',
-    attack: 2500,
-    defense: 2100,
-    description: 'The ultimate wizard in terms of attack and defense.',
-    imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-005',
-    cardNumber: '005',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '3',
-    name: 'Red-Eyes Black Dragon',
-    type: 'Normal Monster',
-    attribute: 'DARK',
-    level: 7,
-    race: 'Dragon',
-    attack: 2400,
-    defense: 2000,
-    description: 'A ferocious dragon with a deadly attack.',
-    imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-006',
-    cardNumber: '006',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '4',
-    name: 'Pot of Greed',
-    type: 'Spell Card',
-    description: 'Draw 2 cards from your deck.',
-    imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-118',
-    cardNumber: '118',
-    isReprint: false,
-    isBanned: true,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '5',
-    name: 'Mirror Force',
-    type: 'Trap Card',
-    description: 'When an opponent\'s monster declares an attack: Destroy all Attack Position monsters your opponent controls.',
-    imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-119',
-    cardNumber: '119',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '6',
-    name: 'Summoned Skull',
-    type: 'Effect Monster',
-    attribute: 'DARK',
-    level: 6,
-    race: 'Fiend',
-    attack: 2500,
-    defense: 1200,
-    description: 'A fiend with dark powers for confusing the enemy.',
-    imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-003',
-    cardNumber: '003',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  }
-]
-
 export default function CardsPage() {
+  const [cards, setCards] = useState<Card[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedType, setSelectedType] = useState<string>('all')
   const [selectedAttribute, setSelectedAttribute] = useState<string>('all')
@@ -142,15 +18,31 @@ export default function CardsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist()
 
+  useEffect(() => {
+    async function fetchCards() {
+      setLoading(true)
+      try {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/cards')
+        if (!res.ok) throw new Error('Failed to fetch cards')
+        const data = await res.json()
+        setCards(data)
+      } catch (err) {
+        setCards([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCards()
+  }, [])
+
   // Filter and sort cards
-  const filteredCards = mockCards
+  const filteredCards = cards
     .filter(card => {
       const matchesSearch = card.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            card.description.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesType = selectedType === 'all' || card.type === selectedType
       const matchesAttribute = selectedAttribute === 'all' || card.attribute === selectedAttribute
       const matchesRarity = selectedRarity === 'all' || card.rarity === selectedRarity
-      
       return matchesSearch && matchesType && matchesAttribute && matchesRarity
     })
     .sort((a, b) => {
@@ -282,7 +174,7 @@ export default function CardsPage() {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-gray-600">
-            Showing {filteredCards.length} of {mockCards.length} cards
+            Showing {filteredCards.length} of {cards.length} cards
           </p>
         </div>
 

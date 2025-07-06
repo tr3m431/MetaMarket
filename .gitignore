@@ -107,3 +107,90 @@ temp/
 Metamarket Requirements.pdf
 *.pdf backend/venv/
 backend/venv/
+
+# Security and sensitive information
+# Files containing passwords, API keys, tokens, etc.
+*password*
+*secret*
+*key*
+*token*
+*credential*
+*auth*
+*private*
+*sensitive*
+*confidential*
+
+# Database files and credentials
+*.db
+*.sqlite
+*.sqlite3
+database.yml
+config/database.yml
+
+# Configuration files that might contain secrets
+config.json
+secrets.json
+credentials.json
+service-account*.json
+
+# Backup files that might contain sensitive data
+*.bak
+*.backup
+*.old
+
+# Docker secrets
+docker-secrets/
+secrets/
+
+# Certificate files
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# SSH keys
+id_rsa
+id_rsa.pub
+*.ppk
+
+# AWS credentials
+.aws/
+aws-credentials
+
+# Google Cloud credentials
+gcloud/
+service-account*.json
+
+# Azure credentials
+.azure/
+
+# Heroku credentials
+.heroku/
+
+# Local development files with potential secrets
+local/
+dev/
+development/
+
+# Test files that might contain mock credentials
+test-credentials/
+mock-secrets/
+
+# Log files that might contain sensitive information
+*.log
+logs/
+error.log
+access.log
+
+# Cache files that might contain sensitive data
+.cache/
+cache/
+*.cache
+
+# Temporary files that might contain sensitive data
+*.tmp
+*.temp
+temp/
+tmp/

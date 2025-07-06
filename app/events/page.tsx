@@ -11,7 +11,7 @@ export default function EventsPage() {
   useEffect(() => {
     fetch('http://localhost:8000/tournaments')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch tournaments')
+        if (!res.ok) throw new Error('Failed to fetch events')
         return res.json()
       })
       .then(setTournaments)
@@ -31,13 +31,13 @@ export default function EventsPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           {error ? (
             <div className="text-center py-8 text-red-600">
-              <p className="text-lg font-medium">Error loading tournaments</p>
+              <p className="text-lg font-medium">Error loading events</p>
               <p className="text-sm text-gray-500 mt-2">{error}</p>
             </div>
           ) : !tournaments ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading tournaments...</p>
+              <p className="text-gray-600">Loading events...</p>
             </div>
           ) : (
             <EventBrowser tournaments={tournaments} />

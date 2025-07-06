@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from database import SessionLocal
-from models import Tournament as TournamentModel, Decklist as DecklistModel
+from models import Tournament as TournamentModel, Decklist as DecklistModel, Card as CardModel
 from models import Base
 
 app = FastAPI()
@@ -158,3 +158,14 @@ def delete_decklist(tournament_id: str, decklist_id: str, db: Session = Depends(
     db.delete(db_decklist)
     db.commit()
     return {"detail": "Decklist deleted"}
+
+@app.get("/cards", response_model=List[Card])
+def get_cards(db: Session = Depends(get_db)):
+    return db.query(CardModel).all()
+
+@app.get("/cards/{card_id}", response_model=Card)
+def get_card(card_id: str, db: Session = Depends(get_db)):
+    card = db.query(CardModel).filter(CardModel.id == card_id).first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+    return card

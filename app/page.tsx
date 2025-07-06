@@ -1,115 +1,50 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { MagnifyingGlassIcon, ArrowTrendingUpIcon, ChartBarIcon, BellIcon } from '@heroicons/react/24/outline'
-import { Card } from '@/types/card'
-
-// Mock data for demonstration
-const trendingCards: Card[] = [
-  {
-    id: '1',
-    name: 'Blue-Eyes White Dragon',
-    type: 'Normal Monster',
-    attribute: 'LIGHT',
-    level: 8,
-    race: 'Dragon',
-    attack: 3000,
-    defense: 2500,
-    description: 'This legendary dragon is a powerful engine of destruction. Virtually invincible, very few have faced this awesome creature and lived to tell the tale.',
-    imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-001',
-    cardNumber: '001',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '2',
-    name: 'Dark Magician',
-    type: 'Normal Monster',
-    attribute: 'DARK',
-    level: 7,
-    race: 'Spellcaster',
-    attack: 2500,
-    defense: 2100,
-    description: 'The ultimate wizard in terms of attack and defense.',
-    imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-005',
-    cardNumber: '005',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '3',
-    name: 'Red-Eyes Black Dragon',
-    type: 'Normal Monster',
-    attribute: 'DARK',
-    level: 7,
-    race: 'Dragon',
-    attack: 2400,
-    defense: 2000,
-    description: 'A ferocious dragon with a deadly attack.',
-    imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
-    rarity: 'Ultra Rare',
-    set: 'Legend of Blue Eyes White Dragon',
-    setCode: 'LOB-006',
-    cardNumber: '006',
-    isReprint: false,
-    isBanned: false,
-    isLimited: false,
-    isSemiLimited: false,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  }
-]
-
-const recentTournaments = [
-  {
-    id: '1',
-    name: 'YCS Las Vegas 2024',
-    date: '2024-01-15',
-    location: 'Las Vegas, NV',
-    format: 'Advanced',
-    size: 1024,
-    winner: 'Joshua Schmidt',
-    winningDeck: 'Kashtira'
-  },
-  {
-    id: '2',
-    name: 'YCS Chicago 2024',
-    date: '2024-01-08',
-    location: 'Chicago, IL',
-    format: 'Advanced',
-    size: 856,
-    winner: 'Michael Zhang',
-    winningDeck: 'Labrynth'
-  },
-  {
-    id: '3',
-    name: 'YCS Dallas 2024',
-    date: '2024-01-01',
-    location: 'Dallas, TX',
-    format: 'Advanced',
-    size: 724,
-    winner: 'Sarah Johnson',
-    winningDeck: 'Purrley'
-  }
-]
+import { Card, Tournament } from '@/types/card'
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [recentTournaments, setRecentTournaments] = useState<Tournament[]>([])
+  const [trendingCards, setTrendingCards] = useState<Card[]>([])
+  const [loading, setLoading] = useState(true)
+  const [cardsLoading, setCardsLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('http://localhost:8000/tournaments')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch tournaments')
+        return res.json()
+      })
+      .then(data => {
+        // Take the first 3 tournaments for the homepage
+        setRecentTournaments(data.slice(0, 3))
+      })
+      .catch(err => {
+        console.error('Error fetching tournaments:', err)
+        setRecentTournaments([])
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    fetch('http://localhost:8000/cards')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch cards')
+        return res.json()
+      })
+      .then(data => {
+        // Take the first 3 cards for the homepage
+        setTrendingCards(data.slice(0, 3))
+      })
+      .catch(err => {
+        console.error('Error fetching cards:', err)
+        setTrendingCards([])
+      })
+      .finally(() => setCardsLoading(false))
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -197,37 +132,49 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {trendingCards.map((card) => (
-              <div key={card.id} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Card</span>
+          {cardsLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading cards...</p>
+            </div>
+          ) : trendingCards.length === 0 ? (
+            <div className="text-center py-8 text-gray-600">
+              <p className="text-lg font-medium">No cards available</p>
+              <p className="text-sm text-gray-500 mt-2">Check back later for trending cards!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {trendingCards.map((card) => (
+                <div key={card.id} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">Card</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{card.name}</h3>
+                      <p className="text-sm text-gray-600">{card.type}</p>
+                      <p className="text-sm text-gray-500">{card.set}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{card.name}</h3>
-                    <p className="text-sm text-gray-600">{card.type}</p>
-                    <p className="text-sm text-gray-500">{card.set}</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-lg font-bold text-green-600">$45.99</span>
+                    <span className="text-sm text-green-600">+12.5%</span>
+                  </div>
+                  <div className="mt-4 flex space-x-2">
+                    <Link
+                      href={`/cards/${card.id}`}
+                      className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      View Details
+                    </Link>
+                    <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors text-sm">
+                      Watch
+                    </button>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-lg font-bold text-green-600">$45.99</span>
-                  <span className="text-sm text-green-600">+12.5%</span>
-                </div>
-                <div className="mt-4 flex space-x-2">
-                  <Link
-                    href={`/cards/${card.id}`}
-                    className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                  >
-                    View Details
-                  </Link>
-                  <button className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors text-sm">
-                    Watch
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -241,26 +188,38 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recentTournaments.map((tournament) => (
-              <div key={tournament.id} className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">{tournament.name}</h3>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <p>{tournament.date} • {tournament.location}</p>
-                  <p>{tournament.format} Format • {tournament.size} Players</p>
-                  <p className="font-medium text-gray-900">
-                    Winner: {tournament.winner} ({tournament.winningDeck})
-                  </p>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading tournaments...</p>
+            </div>
+          ) : recentTournaments.length === 0 ? (
+            <div className="text-center py-8 text-gray-600">
+              <p className="text-lg font-medium">No tournaments available</p>
+              <p className="text-sm text-gray-500 mt-2">Check back later for upcoming events!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentTournaments.map((tournament) => (
+                <div key={tournament.id} className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="font-semibold text-gray-900 mb-2">{tournament.name}</h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <p>{tournament.date} • {tournament.location}</p>
+                    <p>{tournament.format} Format • {tournament.size} Players</p>
+                    <p className="font-medium text-gray-900">
+                      Top Cut: {tournament.topCut} • {tournament.region}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/events/${tournament.id}`}
+                    className="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    View Results
+                  </Link>
                 </div>
-                <Link
-                  href={`/events/${tournament.id}`}
-                  className="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                >
-                  View Results
-                </Link>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

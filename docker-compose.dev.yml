@@ -1,54 +1,57 @@
+version: '3.8'
 services:
-  db:
-    image: postgres:14
-    restart: always
-    environment:
-      POSTGRES_USER: tr3m431
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: metamarket
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./app:/app/app
+      - ./components:/app/components
+      - ./contexts:/app/contexts
+      - ./types:/app/types
+      - ./__tests__:/app/__tests__
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./next.config.js:/app/next.config.js
+      - ./tailwind.config.js:/app/tailwind.config.js
+      - ./postcss.config.js:/app/postcss.config.js
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./jest.config.js:/app/jest.config.js
+      - ./jest.setup.js:/app/jest.setup.js
+      - /app/node_modules
     ports:
-      - "5432:5432"
-    networks:
-      - metamarket-network
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
 
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
       - ./backend:/app
-      - /app/__pycache__
-      - /app/.pytest_cache
-    environment:
-      DATABASE_URL: postgresql://tr3m431:password@db:5432/metamarket
-      PYTHONPATH: /app
     ports:
       - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://postgres:password@db:5432/metamarket
     depends_on:
       - db
-    networks:
-      - metamarket-network
-    command: bash -c "while ! nc -z db 5432; do sleep 1; done; cd /app && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-  frontend:
-    build: 
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "3000:3000"
+  db:
+    image: postgres:14
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - NODE_ENV=development
-    depends_on:
-      - backend
-    networks:
-      - metamarket-network
+      - POSTGRES_DB=metamarket
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
-
-networks:
-  metamarket-network:
-    driver: bridge 
+  postgres_data: 

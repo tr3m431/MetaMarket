@@ -6,6 +6,7 @@ import { MagnifyingGlassIcon, FunnelIcon, HeartIcon, ChevronLeftIcon, ChevronRig
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Card } from '@/types/card'
 import { useWatchlist } from '@/contexts/WatchlistContext'
+import CardComponent from '@/components/CardComponent'
 
 export default function CardsPage() {
   const [cards, setCards] = useState<Card[]>([])
@@ -49,13 +50,9 @@ export default function CardsPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cards?${params.toString()}`)
         if (!res.ok) throw new Error('Failed to fetch cards')
         const data = await res.json()
-        setCards(data)
-        
-        // Estimate total based on current results and page
-        // In a real app, the backend would return total count
-        const estimatedTotal = data.length === cardsPerPage ? 13775 : (currentPage - 1) * cardsPerPage + data.length
-        setTotalCards(estimatedTotal)
-        setTotalPages(Math.ceil(estimatedTotal / cardsPerPage))
+        setCards(data.cards)
+        setTotalCards(data.total)
+        setTotalPages(Math.max(1, Math.ceil(data.total / cardsPerPage)))
       } catch (err) {
         setCards([])
         setTotalCards(0)
@@ -198,8 +195,6 @@ export default function CardsPage() {
     }
     return []
   }
-
-
 
   const rarities = ['Common', 'Rare', 'Super Rare', 'Ultra Rare', 'Secret Rare', 'Ultimate Rare']
 
@@ -379,113 +374,36 @@ export default function CardsPage() {
 
         {/* Cards Grid */}
         {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {sortedCards.map((card) => (
-              <div key={card.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-                {/* Card Image */}
-                <div className="aspect-[3/4] bg-gray-200 flex items-center justify-center">
-                  {card.imageUrl ? (
-                    <img
-                      src={card.imageUrl}
-                      alt={card.name}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (nextSibling) {
-                          nextSibling.style.display = 'flex';
+              <div key={card.id} className="flex flex-col h-full">
+                <CardComponent card={card}>
+                  <div className="flex w-full gap-2 mt-4">
+                    <Link
+                      href={`/cards/${card.id}`}
+                      className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center text-sm"
+                    >
+                      View Details
+                    </Link>
+                    <button
+                      onClick={() => {
+                        if (isInWatchlist(card.id)) {
+                          removeFromWatchlist(card.id)
+                        } else {
+                          addToWatchlist(card)
                         }
                       }}
-                    />
-                  ) : null}
-                  <div className="absolute inset-0 flex items-center justify-center" style={{ display: card.imageUrl ? 'none' : 'flex' }}>
-                    <span className="text-gray-500 text-sm">Card Image</span>
-                  </div>
-                </div>
-
-                {/* Card Info */}
-                <div className="p-4 flex flex-col flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 line-clamp-2">{card.name}</h3>
-                    <button
-                      onClick={() => handleWatchlistToggle(card)}
-                      className="flex-shrink-0 ml-2 p-1 text-gray-400 hover:text-red-500 transition-colors"
+                      disabled={false}
+                      className={`p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 transition-colors flex items-center justify-center ${isInWatchlist(card.id) ? 'text-red-500' : 'text-gray-400'}`}
                     >
                       {isInWatchlist(card.id) ? (
-                        <HeartSolidIcon className="h-5 w-5 text-red-500" />
+                        <HeartSolidIcon className="h-5 w-5" />
                       ) : (
                         <HeartIcon className="h-5 w-5" />
                       )}
                     </button>
                   </div>
-
-                  <p className="text-sm text-gray-600 mb-2">{card.type}</p>
-                  
-                  {card.attribute && (
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mb-2">
-                      <span>{card.attribute}</span>
-                      {card.level && <span>Level {card.level}</span>}
-                    </div>
-                  )}
-
-                  {card.attack && (
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mb-3">
-                      <span>ATK: {card.attack}</span>
-                      {card.defense && <span>DEF: {card.defense}</span>}
-                    </div>
-                  )}
-
-                  <p className="text-xs text-gray-600 line-clamp-2 mb-3">{card.description}</p>
-
-                  <div className="space-y-1 text-xs text-gray-500">
-                    <div className="flex justify-between">
-                      <span>Set:</span>
-                      <span className="font-medium">{card.set}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Rarity:</span>
-                      <span className="font-medium">{card.rarity}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Number:</span>
-                      <span className="font-medium">{card.setCode}-{card.cardNumber}</span>
-                    </div>
-                  </div>
-
-                  {/* Status Badges */}
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {card.isBanned && (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                        Banned
-                      </span>
-                    )}
-                    {card.isLimited && (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                        Limited
-                      </span>
-                    )}
-                    {card.isSemiLimited && (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
-                        Semi-Limited
-                      </span>
-                    )}
-                    {card.isReprint && (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        Reprint
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Actions - Pushed to bottom */}
-                  <div className="mt-auto pt-4 flex space-x-2">
-                    <Link
-                      href={`/cards/${card.id}`}
-                      className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
+                </CardComponent>
               </div>
             ))}
           </div>

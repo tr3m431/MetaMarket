@@ -10,11 +10,13 @@ import { Card } from '@/types/card'
 
 interface CardComponentProps {
   card: Card
+  children?: React.ReactNode
 }
 
-export default function CardComponent({ card }: CardComponentProps) {
+export default function CardComponent({ card, children }: CardComponentProps) {
   const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist()
   const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const handleWatchlistToggle = async () => {
     setIsAddingToWatchlist(true)
@@ -33,17 +35,16 @@ export default function CardComponent({ card }: CardComponentProps) {
   const isInUserWatchlist = isInWatchlist(card.id)
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full min-h-[480px]">
       {/* Card Image */}
-      <div className="relative aspect-[3/4]">
+      <div className="relative w-full h-64 flex items-center justify-center bg-gray-100">
         <Image
           src={card.imageUrl}
           alt={card.name}
           fill
-          className="object-cover"
+          className="object-contain"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        
         {/* Status Badges */}
         <div className="absolute top-3 left-3 flex flex-col space-y-1">
           {card.isBanned && (
@@ -67,23 +68,10 @@ export default function CardComponent({ card }: CardComponentProps) {
             </span>
           )}
         </div>
-
-        {/* Watchlist Button */}
-        <button
-          onClick={handleWatchlistToggle}
-          disabled={isAddingToWatchlist}
-          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
-        >
-          {isInUserWatchlist ? (
-            <HeartSolidIcon className="h-5 w-5 text-red-500" />
-          ) : (
-            <HeartIcon className="h-5 w-5 text-gray-400 hover:text-red-500" />
-          )}
-        </button>
       </div>
 
       {/* Card Info */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex items-start justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
             {card.name}
@@ -91,48 +79,44 @@ export default function CardComponent({ card }: CardComponentProps) {
         </div>
         
         <div className="space-y-2 mb-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Type:</span>
-            <span className="font-medium">{card.type}</span>
-          </div>
-          
-          {card.attribute && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Attribute:</span>
-              <span className="font-medium">{card.attribute}</span>
-            </div>
-          )}
-          
-          {card.level && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Level:</span>
-              <span className="font-medium">{card.level}</span>
-            </div>
-          )}
-          
-          {card.race && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Race:</span>
-              <span className="font-medium">{card.race}</span>
-            </div>
-          )}
-          
-          {card.attack && card.defense && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">ATK/DEF:</span>
-              <span className="font-medium">{card.attack}/{card.defense}</span>
-            </div>
-          )}
-          
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Rarity:</span>
-            <span className="font-medium">{card.rarity}</span>
-          </div>
-          
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Set:</span>
-            <span className="font-medium">{card.set}</span>
-          </div>
+          {(() => {
+            const infoRows = [
+              { label: 'Type', value: card.type },
+              card.attribute ? { label: 'Attribute', value: card.attribute } : null,
+              card.level ? { label: 'Level', value: card.level } : null,
+              card.subtype ? { label: 'Subtype', value: card.subtype } : null,
+              card.attack && card.defense ? { label: 'ATK/DEF', value: `${card.attack}/${card.defense}` } : null,
+              card.set ? { label: 'Set', value: card.set } : null,
+            ].filter((row): row is { label: string; value: string } => row !== null)
+            const rowsToShow = expanded ? infoRows : infoRows.slice(0, 2)
+            return (
+              <>
+                {rowsToShow.map((row, idx) => (
+                  <div key={idx} className="flex items-center text-sm">
+                    {row.label === 'Set' ? (
+                      <>
+                        <span className="text-gray-600 whitespace-nowrap">{row.label}:&nbsp;</span>
+                        <span className="font-medium max-w-[8rem] truncate" title={row.value}>{row.value}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-gray-600 whitespace-nowrap">{row.label}:&nbsp;</span>
+                        <span className="font-medium">{row.value}</span>
+                      </>
+                    )}
+                  </div>
+                ))}
+                {infoRows.length > 2 && (
+                  <button
+                    className="text-xs text-primary-600 hover:underline mt-1"
+                    onClick={() => setExpanded(e => !e)}
+                  >
+                    {expanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         <p className="text-gray-600 text-sm mb-4 line-clamp-3">
@@ -140,14 +124,7 @@ export default function CardComponent({ card }: CardComponentProps) {
         </p>
 
         {/* Actions */}
-        <div className="flex space-x-2">
-          <Link
-            href={`/cards/${card.id}`}
-            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center text-sm"
-          >
-            View Details
-          </Link>
-        </div>
+        <div className="mt-auto">{children}</div>
       </div>
     </div>
   )

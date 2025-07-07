@@ -67,14 +67,21 @@ def populate_cards_on_startup():
             
             print(f"Fetched {len(cards)} cards from YGOPRODeck")
             
-            # Insert cards into database
+            # Insert only TCG cards into database
+            tcg_count = 0
             for ygocard in cards:
+                card_sets = ygocard.get('card_sets', [])
+                # Only add if at least one set is not OCG and not Speed Duel
+                has_tcg_set = any('OCG' not in setinfo.get('set_name', '') and 'Speed Duel' not in setinfo.get('set_name', '') for setinfo in card_sets)
+                if not has_tcg_set:
+                    continue
                 card_data = map_card(ygocard)
                 db_card = CardModel(**card_data)
                 db.add(db_card)
+                tcg_count += 1
             
             db.commit()
-            print(f"Successfully populated {len(cards)} cards into database")
+            print(f"Successfully populated {tcg_count} TCG cards into database")
         else:
             print(f"Cards table already has {card_count} cards. Skipping population.")
             
@@ -85,6 +92,15 @@ def populate_cards_on_startup():
 
 # Populate cards on startup
 populate_cards_on_startup()
+
+# Scrape and populate events on startup
+try:
+    from scripts.scrape_events import fetch_events, store_events
+    events = fetch_events()
+    print(f"Fetched {len(events)} events from official site.")
+    store_events(events)
+except Exception as e:
+    print(f"Error scraping events on startup: {e}")
 
 # --- Models ---
 class Card(BaseModel):
@@ -258,7 +274,7 @@ def delete_decklist(tournament_id: str, decklist_id: str, db: Session = Depends(
     db.commit()
     return {"detail": "Decklist deleted"}
 
-@app.get("/cards", response_model=List[Card])
+@app.get("/cards")
 def get_cards(
     limit: int = 24, 
     offset: int = 0, 
@@ -306,9 +322,9 @@ def get_cards(
             (CardModel.description.ilike(search_term))
         )
     
-    # Apply pagination
+    total = query.count()
     cards = query.offset(offset).limit(limit).all()
-    return cards
+    return { 'cards': cards, 'total': total }
 
 @app.get("/cards/{card_id}", response_model=Card)
 def get_card(card_id: str, db: Session = Depends(get_db)):

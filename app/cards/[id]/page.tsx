@@ -3,40 +3,15 @@
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import CardDetailPage from '@/components/CardDetailPage'
-import { Card, PriceHistory, PricePrediction } from '@/types/card'
+import PriceChart from '@/components/PriceChart'
+import PriceSummary from '@/components/PriceSummary'
+import { Card } from '@/types/card'
 
 export default function Page() {
   const { id } = useParams()
   const [card, setCard] = useState<Card | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Placeholder data for price history and prediction
-  const placeholderPriceHistory: PriceHistory = {
-    data: [
-      { date: '2024-01-01', price: 25.99 },
-      { date: '2024-01-08', price: 28.50 },
-      { date: '2024-01-15', price: 26.75 },
-      { date: '2024-01-22', price: 30.25 },
-      { date: '2024-01-29', price: 32.00 },
-      { date: '2024-02-05', price: 29.50 },
-      { date: '2024-02-12', price: 31.75 },
-    ],
-    vendor: 'TCGPlayer'
-  }
-
-  const placeholderPrediction: PricePrediction = {
-    currentPrice: 31.75,
-    predictedPrice: 35.50,
-    changePercentage: 11.8,
-    direction: 'up',
-    confidence: 0.85,
-    factors: [
-      'Recent tournament usage',
-      'Meta relevance',
-      'Limited print run'
-    ]
-  }
 
   useEffect(() => {
     if (!id) return
@@ -55,5 +30,22 @@ export default function Page() {
   if (loading) return <div>Loading...</div>
   if (error) return <div className="text-red-500">{error}</div>
   if (!card) return <div>Card not found.</div>
-  return <CardDetailPage card={card} priceHistory={placeholderPriceHistory} prediction={placeholderPrediction} />
+  
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Card Details */}
+        <CardDetailPage card={card} />
+        
+        {/* Price Tracking Section */}
+        <div className="mt-8 space-y-8">
+          {/* Price Summary */}
+          <PriceSummary cardId={card.id} />
+          
+          {/* Price Chart */}
+          <PriceChart cardId={card.id} days={30} />
+        </div>
+      </div>
+    </div>
+  )
 } 

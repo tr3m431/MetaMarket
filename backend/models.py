@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Date, Text
+from sqlalchemy import Column, String, Integer, Boolean, ForeignKey, Date, Text, Numeric, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -49,4 +49,45 @@ class Decklist(Base):
     mainDeck = Column(JSONB)
     extraDeck = Column(JSONB)
     sideDeck = Column(JSONB)
-    tournament = relationship('Tournament', back_populates='decklists') 
+    tournament = relationship('Tournament', back_populates='decklists')
+
+# --- Price Tracking Models ---
+class Vendor(Base):
+    __tablename__ = 'vendors'
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    url = Column(String)
+    api_endpoint = Column(String)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+class PriceHistory(Base):
+    __tablename__ = 'price_history'
+    id = Column(String, primary_key=True)
+    card_id = Column(String, ForeignKey('cards.id'), nullable=False)
+    vendor_id = Column(String, ForeignKey('vendors.id'), nullable=False)
+    price = Column(Numeric(precision=10, scale=2), nullable=False)
+    currency = Column(String, nullable=False)
+    condition = Column(String)  # NM, LP, MP, etc.
+    rarity = Column(String)
+    set_code = Column(String)
+    recorded_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime)
+    
+    # Relationships
+    card = relationship('Card')
+    vendor = relationship('Vendor')
+
+class PriceAlert(Base):
+    __tablename__ = 'price_alerts'
+    id = Column(String, primary_key=True)
+    user_id = Column(String, nullable=False)
+    card_id = Column(String, ForeignKey('cards.id'), nullable=False)
+    target_price = Column(Numeric(precision=10, scale=2))
+    alert_type = Column(String, nullable=False)  # 'above', 'below', 'change'
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    
+    # Relationships
+    card = relationship('Card') 

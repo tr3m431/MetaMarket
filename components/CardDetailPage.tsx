@@ -10,8 +10,8 @@ import { mockTournaments } from '@/types/mockTournaments'
 
 interface CardDetailPageProps {
   card: Card
-  priceHistory: PriceHistory
-  prediction: PricePrediction
+  priceHistory?: PriceHistory
+  prediction?: PricePrediction
 }
 
 function getCardUsageStats(cardId: string) {
@@ -66,8 +66,21 @@ export default function CardDetailPage({ card, priceHistory, prediction }: CardD
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6">
               {/* Card Image */}
-              <div className="aspect-square bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                <span className="text-gray-500">Card Image</span>
+              <div className="aspect-[3/4] bg-gray-200 rounded-lg mb-4 flex items-center justify-center relative">
+                {card.imageUrl ? (
+                  <img
+                    src={card.imageUrl}
+                    alt={card.name}
+                    className="w-full h-full object-contain rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="absolute inset-0 flex items-center justify-center" style={{ display: card.imageUrl ? 'none' : 'flex' }}>
+                  <span className="text-gray-500">Card Image</span>
+                </div>
               </div>
 
               {/* Card Details */}
@@ -156,119 +169,123 @@ export default function CardDetailPage({ card, priceHistory, prediction }: CardD
 
           {/* Charts and Analysis */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Price Prediction */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Price Prediction</h2>
-                <div className="flex items-center space-x-2">
-                  <select
-                    value={selectedTimeframe}
-                    onChange={(e) => setSelectedTimeframe(e.target.value as any)}
-                    className="border border-gray-300 rounded-lg px-3 py-1 text-sm"
-                  >
-                    <option value="1week">1 Week</option>
-                    <option value="1month">1 Month</option>
-                    <option value="3months">3 Months</option>
-                    <option value="6months">6 Months</option>
-                  </select>
+            {/* Price Prediction - Only show if prediction data is available */}
+            {prediction && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Price Prediction</h2>
+                  <div className="flex items-center space-x-2">
+                    <select
+                      value={selectedTimeframe}
+                      onChange={(e) => setSelectedTimeframe(e.target.value as any)}
+                      className="border border-gray-300 rounded-lg px-3 py-1 text-sm"
+                    >
+                      <option value="1week">1 Week</option>
+                      <option value="1month">1 Month</option>
+                      <option value="3months">3 Months</option>
+                      <option value="6months">6 Months</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">Current Price</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatPrice(prediction.currentPrice)}</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500">Current Price</p>
+                    <p className="text-2xl font-bold text-gray-900">{formatPrice(prediction.currentPrice)}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500">Predicted Price</p>
+                    <p className="text-2xl font-bold text-green-600">{formatPrice(prediction.predictedPrice)}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500">Change</p>
+                    <div className="flex items-center justify-center space-x-1">
+                      {prediction.direction === 'up' ? (
+                        <ArrowTrendingUpIcon className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <ArrowTrendingDownIcon className="h-5 w-5 text-red-600" />
+                      )}
+                      <span className={`text-xl font-bold ${prediction.direction === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(prediction.changePercentage)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">Predicted Price</p>
-                  <p className="text-2xl font-bold text-green-600">{formatPrice(prediction.predictedPrice)}</p>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-900 font-medium mb-2">Prediction Explanation</p>
+                  <p className="text-sm text-blue-700">{prediction.explanation}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">Change</p>
-                  <div className="flex items-center justify-center space-x-1">
-                    {prediction.direction === 'up' ? (
-                      <ArrowTrendingUpIcon className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <ArrowTrendingDownIcon className="h-5 w-5 text-red-600" />
-                    )}
-                    <span className={`text-xl font-bold ${prediction.direction === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatPercentage(prediction.changePercentage)}
-                    </span>
+
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Factors</h3>
+                  <div className="space-y-3">
+                    {prediction.factors.map((factor, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-900">{factor.factor}</p>
+                          <p className="text-sm text-gray-600">{factor.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            factor.impact === 'positive' ? 'bg-green-100 text-green-800' :
+                            factor.impact === 'negative' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {factor.impact}
+                          </span>
+                          <p className="text-sm text-gray-500 mt-1">Weight: {(factor.weight * 100).toFixed(0)}%</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+            )}
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-900 font-medium mb-2">Prediction Explanation</p>
-                <p className="text-sm text-blue-700">{prediction.explanation}</p>
-              </div>
+            {/* Price History Chart - Only show if price history data is available */}
+            {priceHistory && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Price History</h2>
+                  <select
+                    value={selectedVendor}
+                    onChange={(e) => setSelectedVendor(e.target.value as any)}
+                    className="border border-gray-300 rounded-lg px-3 py-1 text-sm"
+                  >
+                    <option value="TCGPlayer">TCGPlayer</option>
+                    <option value="Cardmarket">Cardmarket</option>
+                    <option value="YugiohPrices">YugiohPrices</option>
+                  </select>
+                </div>
 
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Factors</h3>
-                <div className="space-y-3">
-                  {prediction.factors.map((factor, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-900">{factor.factor}</p>
-                        <p className="text-sm text-gray-600">{factor.description}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          factor.impact === 'positive' ? 'bg-green-100 text-green-800' :
-                          factor.impact === 'negative' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {factor.impact}
-                        </span>
-                        <p className="text-sm text-gray-500 mt-1">Weight: {(factor.weight * 100).toFixed(0)}%</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={priceHistory.prices}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                      />
+                      <YAxis 
+                        tickFormatter={(value) => `$${value}`}
+                      />
+                      <Tooltip 
+                        labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                        formatter={(value: number) => [`$${value}`, 'Price']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="price" 
+                        stroke="#3B82F6" 
+                        strokeWidth={2}
+                        dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
-            </div>
-
-            {/* Price History Chart */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Price History</h2>
-                <select
-                  value={selectedVendor}
-                  onChange={(e) => setSelectedVendor(e.target.value as any)}
-                  className="border border-gray-300 rounded-lg px-3 py-1 text-sm"
-                >
-                  <option value="TCGPlayer">TCGPlayer</option>
-                  <option value="Cardmarket">Cardmarket</option>
-                  <option value="YugiohPrices">YugiohPrices</option>
-                </select>
-              </div>
-
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={priceHistory.prices}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="date" 
-                      tickFormatter={(value) => new Date(value).toLocaleDateString()}
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => `$${value}`}
-                    />
-                    <Tooltip 
-                      labelFormatter={(value) => new Date(value).toLocaleDateString()}
-                      formatter={(value: number) => [`$${value}`, 'Price']}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="price" 
-                      stroke="#3B82F6" 
-                      strokeWidth={2}
-                      dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            )}
 
             {/* Tournament Usage Section */}
             <div className="bg-white rounded-lg shadow-md p-6 mt-8">

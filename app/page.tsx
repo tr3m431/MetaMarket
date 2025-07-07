@@ -147,8 +147,21 @@ export default function HomePage() {
               {trendingCards.map((card) => (
                 <div key={card.id} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-500 text-sm">Card</span>
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center relative">
+                      {card.imageUrl ? (
+                        <img
+                          src={card.imageUrl}
+                          alt={card.name}
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ display: card.imageUrl ? 'none' : 'flex' }}>
+                        <span className="text-gray-500 text-sm">Card</span>
+                      </div>
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{card.name}</h3>

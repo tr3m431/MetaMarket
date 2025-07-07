@@ -108,6 +108,14 @@ Metamarket Requirements.pdf
 *.pdf backend/venv/
 backend/venv/
 
+# Database files and data
+data/
+*.db
+*.sqlite
+*.sqlite3
+database.yml
+config/database.yml
+
 # Security and sensitive information
 # Files containing passwords, API keys, tokens, etc.
 *password*
@@ -119,13 +127,6 @@ backend/venv/
 *private*
 *sensitive*
 *confidential*
-
-# Database files and credentials
-*.db
-*.sqlite
-*.sqlite3
-database.yml
-config/database.yml
 
 # Configuration files that might contain secrets
 config.json

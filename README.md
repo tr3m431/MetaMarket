@@ -149,6 +149,39 @@ npm run dev
 - [ ] Community-contributed matchup logs
 - [ ] Resale arbitrage alerts (TCGPlayer vs Cardmarket spreads)
 
+## ☁️ Production Deployment (Future)
+
+### Planned Cloud Infrastructure
+After core functionality is complete, MetaMarket will be deployed to production with:
+
+#### **Recommended Platform: Google Cloud Platform (GCP)**
+- **Cloud Run**: Serverless containers for FastAPI backend
+- **Cloud SQL**: Managed PostgreSQL with automated backups
+- **Cloud Storage**: For card images and data files
+- **Cloud Build**: CI/CD pipeline for automated deployments
+- **Cloud Monitoring**: Production-grade monitoring and alerting
+
+#### **Alternative Free Options**
+- **Render**: All-in-one platform (frontend, backend, database)
+- **Vercel + Railway**: Frontend on Vercel, backend on Railway
+- **Netlify + Fly.io**: Static hosting + container deployment
+
+#### **Production Features**
+- [ ] Automated database backups and point-in-time recovery
+- [ ] Load balancing and auto-scaling
+- [ ] CDN for static assets and global performance
+- [ ] SSL/TLS encryption and security headers
+- [ ] Environment-specific configurations
+- [ ] Monitoring, logging, and alerting
+- [ ] Disaster recovery and failover strategies
+
+#### **Deployment Strategy**
+- [ ] Separate development, staging, and production environments
+- [ ] Database migration strategies for zero-downtime deployments
+- [ ] Blue-green deployment for backend services
+- [ ] Automated testing and quality gates
+- [ ] Performance monitoring and optimization
+
 ## 🏗️ Project Structure
 
 ```

@@ -11,7 +11,7 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 - Cache recent data for fast reloads
 
 ### 2. Meta Usage & Event Insights
-- Scrape or manually enter tournament top cut data
+- Scrape or manually enter tournament top-cut data
 - Link cards to decks and decks to events
 - Display usage stats of a card in meta over time
 - Include data filters (format, event size, region)

@@ -13,7 +13,7 @@ export default function HomePage() {
   const [cardsLoading, setCardsLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:8000/tournaments')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tournaments`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch tournaments')
         return res.json()
@@ -30,14 +30,17 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
+    console.log('Fetching cards from: http://localhost:8000/cards')
     fetch('http://localhost:8000/cards')
       .then(res => {
+        console.log('Cards response status:', res.status)
         if (!res.ok) throw new Error('Failed to fetch cards')
         return res.json()
       })
       .then(data => {
+        console.log('Cards data received:', data)
         // Take the first 3 cards for the homepage
-        setTrendingCards(data.slice(0, 3))
+        setTrendingCards(data.cards ? data.cards.slice(0, 3) : [])
       })
       .catch(err => {
         console.error('Error fetching cards:', err)

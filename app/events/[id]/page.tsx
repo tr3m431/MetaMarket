@@ -10,7 +10,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch(`http://localhost:8000/tournaments/${params.id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tournaments/${params.id}`)
       .then(res => {
         if (!res.ok) throw new Error('Tournament not found')
         return res.json()

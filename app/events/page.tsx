@@ -9,7 +9,7 @@ export default function EventsPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('http://localhost:8000/tournaments')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/tournaments`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch events')
         return res.json()

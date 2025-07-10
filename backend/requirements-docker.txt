@@ -36,3 +36,4 @@ numpy==1.26.4
 # Optional: Web scraping (if needed)
 beautifulsoup4==4.9.3
 lxml==6.0.0 
+pytest 

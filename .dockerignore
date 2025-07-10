@@ -49,3 +49,4 @@ backend/
 # Documentation
 README.md
 *.md 
+data/ 

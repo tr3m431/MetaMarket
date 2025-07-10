@@ -5,6 +5,7 @@ export interface Card {
   attribute?: string
   level?: number
   subtype?: string
+  race?: string
   attack?: number
   defense?: number
   description: string

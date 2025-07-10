@@ -74,7 +74,10 @@ export default function CardDetailPage({ card, priceHistory, prediction }: CardD
                     className="w-full h-full object-contain rounded-lg"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                      const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+                      if (next) {
+                        next.style.display = 'flex';
+                      }
                     }}
                   />
                 ) : null}

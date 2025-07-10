@@ -50,9 +50,9 @@ export default function CardsPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cards?${params.toString()}`)
         if (!res.ok) throw new Error('Failed to fetch cards')
         const data = await res.json()
-        setCards(data.cards)
-        setTotalCards(data.total)
-        setTotalPages(Math.max(1, Math.ceil(data.total / cardsPerPage)))
+        setCards(Array.isArray(data.cards) ? data.cards : [])
+        setTotalCards(typeof data.total === 'number' ? data.total : 0)
+        setTotalPages(Math.max(1, Math.ceil((typeof data.total === 'number' ? data.total : 0) / cardsPerPage)))
       } catch (err) {
         setCards([])
         setTotalCards(0)
@@ -70,20 +70,22 @@ export default function CardsPage() {
   }, [selectedType, selectedAttribute, selectedSpellType, selectedTrapType, selectedMonsterType, selectedRarity, searchQuery])
 
   // Sort cards (filtering is now handled by backend)
-  const sortedCards = cards.sort((a, b) => {
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name)
-      case 'type':
-        return a.type.localeCompare(b.type)
-      case 'rarity':
-        return a.rarity.localeCompare(b.rarity)
-      case 'set':
-        return a.set.localeCompare(b.set)
-      default:
-        return 0
-    }
-  })
+  const sortedCards = Array.isArray(cards)
+    ? [...cards].sort((a, b) => {
+        switch (sortBy) {
+          case 'name':
+            return a.name.localeCompare(b.name)
+          case 'type':
+            return a.type.localeCompare(b.type)
+          case 'rarity':
+            return a.rarity.localeCompare(b.rarity)
+          case 'set':
+            return a.set.localeCompare(b.set)
+          default:
+            return 0
+        }
+      })
+    : [];
 
   const handleWatchlistToggle = (card: Card) => {
     if (isInWatchlist(card.id)) {

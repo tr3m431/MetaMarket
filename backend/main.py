@@ -134,17 +134,44 @@ def populate_cards_on_startup():
     finally:
         db.close()
 
+# --- Ensure vendors exist before card/price population ---
+def create_vendors_on_startup():
+    from models import Vendor as VendorModel
+    from datetime import datetime
+    db = SessionLocal()
+    try:
+        existing = db.query(VendorModel).count()
+        if existing == 0:
+            vendors = [
+                VendorModel(id='tcgplayer', name='TCGPlayer', url='https://www.tcgplayer.com', api_endpoint='https://api.tcgplayer.com', created_at=datetime.now(), updated_at=datetime.now()),
+                VendorModel(id='ebay', name='eBay', url='https://www.ebay.com', api_endpoint='https://api.ebay.com', created_at=datetime.now(), updated_at=datetime.now()),
+                VendorModel(id='cardmarket', name='Cardmarket', url='https://www.cardmarket.com', api_endpoint='https://api.cardmarket.com', created_at=datetime.now(), updated_at=datetime.now()),
+            ]
+            for v in vendors:
+                db.add(v)
+            db.commit()
+            print("Vendors table populated.")
+        else:
+            print(f"Vendors table already has {existing} vendors. Skipping vendor population.")
+    except Exception as e:
+        print(f"Error populating vendors: {e}")
+    finally:
+        db.close()
+
+# Ensure vendors exist before cards
+create_vendors_on_startup()
+
 # Populate cards on startup
 populate_cards_on_startup()
 
-# Scrape and populate events on startup
-try:
-    from scripts.scrape_events import fetch_events, store_events
-    events = fetch_events()
-    print(f"Fetched {len(events)} events from official site.")
-    store_events(events)
-except Exception as e:
-    print(f"Error scraping events on startup: {e}")
+# --- Remove event scraping import/call ---
+# try:
+#     from scripts.scrape_events import fetch_events, store_events
+#     events = fetch_events()
+#     print(f"Fetched {len(events)} events from official site.")
+#     store_events(events)
+# except Exception as e:
+#     print(f"Error scraping events on startup: {e}")
 
 # --- Models ---
 class Card(BaseModel):

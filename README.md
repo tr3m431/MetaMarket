@@ -83,7 +83,7 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 ### Storage (Future)
 - AWS S3 / Supabase Storage for decklist files, images
 
-### Scraping (Future)
+### Scraping for Events (Future)
 - **Tools**: BeautifulSoup, Playwright
 - **Sources**: TCGPlayer, YugiohTopDecks, YGOrganization, Reddit
 - **Schedule**: Regular scraping (daily/weekly)

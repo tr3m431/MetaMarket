@@ -91,7 +91,7 @@ An AI-powered web application that tracks, analyzes, and predicts Yu-Gi-Oh! card
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Docker and Docker Compose
+- Docker and Docker-Compose
 - Node.js 18+ (for local development without Docker)
 
 ### Installation with Docker (Recommended)
